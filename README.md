@@ -113,7 +113,12 @@ Key = Student ID
 RID = array index of the record after loading student.csv
 ```
 
-## 6. How to Run the Final Experiment
+## 6. How to Clone and Run the Final Experiment
+
+```bash
+git clone https://github.com/rlawldks112/cse321-project1-btree-index.git
+cd cse321-project1-btree-index
+```
 
 From the project root directory, run:
 
