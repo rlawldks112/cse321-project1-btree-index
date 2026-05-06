@@ -16,16 +16,26 @@ The experiments compare insertion performance, point search performance, range q
 
 The code was tested with:
 
-- Python 3.x
-- No external Python packages required
-- Linux / WSL / macOS compatible shell environment
+- Python 3.13.12
+- WSL2 Linux
+- Intel Core Ultra 7 155H
+- 15 GiB RAM
 
-The implementation uses only the Python standard library.
+No external Python packages are required.  
+This project uses only the Python standard library.
+
+Recommended execution environment:
+
+- Linux
+- WSL
+- macOS terminal
+
+Windows Git Bash may incorrectly use the Windows Store Python alias. If running `python experiments/final_experiment.py` only prints `Python` and does not execute the experiment, use WSL or a properly installed Python interpreter.
 
 ## 3. File Structure
 
 ```text
-cse321_project1/
+cse321-project1-btree-index/
 ├── data/
 │   └── student.csv
 ├── experiments/
@@ -113,17 +123,66 @@ Key = Student ID
 RID = array index of the record after loading student.csv
 ```
 
-## 6. How to Clone and Run the Final Experiment
+## 6. How to Clone
+
+Clone the repository and move into the project directory:
 
 ```bash
 git clone https://github.com/rlawldks112/cse321-project1-btree-index.git
 cd cse321-project1-btree-index
 ```
 
+## 7. How to Check Python
+
+Before running the experiment, check that Python is correctly installed.
+
+```bash
+python --version
+```
+
+Expected output should look like:
+
+```text
+Python 3.x.x
+```
+
+If `python` is not linked to Python 3, try:
+
+```bash
+python3 --version
+```
+
+If you are using Windows Git Bash and the command only prints `Python`, your terminal is likely using the Windows Store Python alias instead of a real Python interpreter.
+
+In that case, use WSL or install Python properly and make sure it appears in your PATH.
+
+You can also check which Python executable is being used:
+
+```bash
+which python
+type python
+```
+
+A problematic Windows Store alias may look like:
+
+```text
+/c/Users/<username>/AppData/Local/Microsoft/WindowsApps/python
+```
+
+If this happens, run the project in WSL instead.
+
+## 8. How to Run the Final Experiment
+
 From the project root directory, run:
 
 ```bash
 python experiments/final_experiment.py
+```
+
+If your environment uses `python3` instead of `python`, run:
+
+```bash
+python3 experiments/final_experiment.py
 ```
 
 This command executes all required experiments:
@@ -145,9 +204,11 @@ The tested tree types are:
 BTree, BPlusTree, BStarTree
 ```
 
-## 7. Experiment Details
+The final experiment may take several minutes because it builds and validates all three tree structures for all tested order values.
 
-### 7.1 Insertion & Parameter Tuning
+## 9. Experiment Details
+
+### 9.1 Insertion & Parameter Tuning
 
 For each tree type and each order `d`, all 100,000 records are inserted into an initially empty tree.
 
@@ -161,7 +222,7 @@ Measured metrics:
 - Number of nodes
 - Node utilization
 
-### 7.2 Point Search
+### 9.2 Point Search
 
 The experiment randomly selects 10,000 existing Student IDs using a fixed random seed.
 
@@ -173,7 +234,7 @@ Measured metrics:
 - Correct count
 - Search accuracy
 
-### 7.3 Range Query
+### 9.3 Range Query
 
 The analytical range query is:
 
@@ -190,7 +251,7 @@ The query computes:
 
 The tree-based result is compared with a brute-force scan over `student.csv`.
 
-### 7.4 Deletion & Structural Integrity
+### 9.4 Deletion & Structural Integrity
 
 The deletion experiment is performed in two phases:
 
@@ -204,7 +265,7 @@ After each phase, the experiment checks:
 - Tree validation passes.
 - Structural metrics are recorded.
 
-## 8. Output Files
+## 10. Output Files
 
 After running the final experiment, the following files are generated under `results/`:
 
@@ -224,7 +285,53 @@ results/experiment_summary.csv
 
 This file combines the key metrics from insertion, search, range query, and deletion experiments into one table.
 
-## 9. Reproducibility
+The CSV files are included in the repository so that the experiment results can be inspected without rerunning the full experiment.
+
+## 11. Expected Output and Key Results
+
+A successful run should end with:
+
+```text
+STEP 40 OVERALL: PASS
+```
+
+The summary file should contain 9 experiment rows:
+
+```text
+3 tree types × 3 order values = 9 rows
+```
+
+A successful run should satisfy:
+
+```text
+overall_pass = True for all rows
+search_accuracy = 1.000000000 for all rows
+delete_10_valid = True for all rows
+delete_20_valid = True for all rows
+```
+
+The range query result should be identical for all tree/order combinations:
+
+```text
+range_matched_count = 10031
+range_avg_gpa = 3.297161798
+range_avg_height = 173.972734523
+```
+
+Representative summary values from `experiment_summary.csv`:
+
+| Tree | d | Insert(s) | Search Avg(s) | Range(s) | Utilization | Overall |
+|---|---:|---:|---:|---:|---:|---|
+| BTree | 3 | 0.676765691 | 0.000007499498 | 0.109096857 | 0.672305065 | True |
+| BPlusTree | 3 | 1.748843042 | 0.000005931870 | 0.059435247 | 0.713946898 | True |
+| BStarTree | 3 | 2.380688248 | 0.000006672727 | 0.102692935 | 0.801127988 | True |
+| BTree | 10 | 0.357719856 | 0.000006309685 | 1.528637001 | 0.678044249 | True |
+| BPlusTree | 10 | 0.320040322 | 0.000003306945 | 0.031978329 | 0.714875700 | True |
+| BStarTree | 10 | 0.695765051 | 0.000003676028 | 0.053563685 | 0.851100047 | True |
+
+Runtime values may vary slightly across machines and runs. However, structural metrics, correctness results, search accuracy, range query counts, and validation results should remain consistent.
+
+## 12. Reproducibility
 
 The experiment uses a fixed random seed:
 
@@ -234,7 +341,7 @@ The experiment uses a fixed random seed:
 
 This ensures that the same search and deletion keys are used across B-tree, B+ tree, and B* tree, enabling fair comparison.
 
-## 10. Optional Local Tests
+## 13. Optional Local Tests
 
 The directory below may contain local development tests:
 
@@ -244,8 +351,9 @@ src/tests/
 
 These files are not required to run the final experiment and are excluded from GitHub submission through `.gitignore`.
 
-## 11. Notes
+## 14. Notes
 
 - `results/*.csv` files are included to provide the measured outputs used for analysis.
 - `src/tests/` is excluded because it contains local development tests that are not required for the final experiment.
-- The final experiment can be reproduced by running `python experiments/final_experiment.py` from the project root.
+- The final experiment can be reproduced by running `python experiments/final_experiment.py` from the project root in a proper Python environment.
+- If Windows Git Bash only prints `Python`, use WSL or fix the Python PATH before running the experiment.
